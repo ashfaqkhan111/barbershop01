@@ -479,7 +479,7 @@ if (!function_exists('savePendingMidtransRefundIntent')) {
             $stmt->execute([
                 ':reservation_id' => $reservationId,
                 ':user_id' => $userId,
-                ':cancelled_by_admin' => $cancelledByAdmin
+                ':cancelled_by_admin' => $cancelledByAdmin ? 'true' : 'false'
             ]);
 
             $pdo->commit();

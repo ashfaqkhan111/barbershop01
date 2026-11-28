@@ -149,7 +149,7 @@ try {
     $stmt->execute([
         ':reservation_id' => $reservationId,
         ':user_id' => $userId ?: 0,
-        ':is_admin' => $isAdmin
+        ':is_admin' => $isAdmin ? 'true' : 'false'
     ]);
 
     $booking = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -608,7 +608,7 @@ $finalizeCardCancellation = static function (?string $adminCancelOutcome = null)
 
         $stmt->execute([
             ':payment_id' => $booking['payment_id'],
-            ':is_admin' => $isAdmin,
+            ':is_admin' => $isAdmin ? 'true' : 'false',
             ':admin_cancel_outcome' => $adminCancelOutcome
         ]);
 
@@ -632,7 +632,7 @@ $finalizeCardCancellation = static function (?string $adminCancelOutcome = null)
 
         $stmt->execute([
             ':reservation_id' => $reservationId,
-            ':is_admin' => $isAdmin
+            ':is_admin' => $isAdmin ? 'true' : 'false'
         ]);
 
         $pdo->commit();
@@ -1185,7 +1185,7 @@ try {
     $stmt->execute([
         ':reservation_id' => $reservationId,
         ':user_id' => $userId,
-        ':is_admin' => $isAdmin
+        ':is_admin' => $isAdmin ? 'true' : 'false'
     ]);
 
     $pdo->commit();
