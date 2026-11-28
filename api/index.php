@@ -1,4 +1,4 @@
-<?php 
+<?php
 declare(strict_types=1);
 
 $root = dirname(__DIR__);
@@ -15,7 +15,7 @@ unset($_GET['__route']);
 if (str_contains($path, "\0") || str_contains($path, '..')) {
     http_response_code(400);
     exit('Bad request');
-} 
+}
 
 if (str_ends_with($path, '/')) {
     $path .= 'index.php';
@@ -42,7 +42,40 @@ foreach ($blocked as $pattern) {
 
 $file = realpath($root . $path);
 
-if ($file === false || !str_starts_with($file, $root . DIRECTORY_SEPARATOR) || !is_file($file) || !str_ends_with($file, '.php')) {
+if ($file === false || !str_starts_with($file, $root . DIRECTORY_SEPARATOR) || !is_file($file)) {
+    http_response_code(404);
+    exit('Not found');
+}
+
+// Serve CSS, JS, images, fonts and plain HTML files directly.
+$staticTypes = [
+    'css'   => 'text/css; charset=utf-8',
+    'js'    => 'application/javascript; charset=utf-8',
+    'html'  => 'text/html; charset=utf-8',
+    'json'  => 'application/json; charset=utf-8',
+    'png'   => 'image/png',
+    'jpg'   => 'image/jpeg',
+    'jpeg'  => 'image/jpeg',
+    'gif'   => 'image/gif',
+    'svg'   => 'image/svg+xml',
+    'webp'  => 'image/webp',
+    'ico'   => 'image/x-icon',
+    'woff'  => 'font/woff',
+    'woff2' => 'font/woff2',
+];
+$extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+if (isset($staticTypes[$extension])) {
+    header('Content-Type: ' . $staticTypes[$extension]);
+    header('Content-Length: ' . filesize($file));
+    header('Cache-Control: public, max-age=3600');
+    header_remove('X-Powered-By');
+    readfile($file);
+    exit;
+}
+
+// Anything else that is not a PHP page is not allowed.
+if ($extension !== 'php') {
     http_response_code(404);
     exit('Not found');
 }
